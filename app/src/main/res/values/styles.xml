@@ -17,4 +17,85 @@
 
     <style name="AppTheme.PopupOverlay" parent="ThemeOverlay.AppCompat.Light" />
 
+    <style name="ProfilePhoto">
+        <item name="android:layout_width">@dimen/profile_size</item>
+        <item name="android:layout_height">@dimen/profile_size</item>
+    </style>
+
+    <style name="BoldPrimaryText">
+        <item name="android:layout_width">wrap_content</item>
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:textColor">@color/secondary</item>
+        <item name="android:textStyle">bold</item>
+        <item name="android:textSize">@dimen/mediumText</item>
+    </style>
+
+    <style name="SecondaryText">
+        <item name="android:layout_width">wrap_content</item>
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:textColor">@color/light_gray</item>
+        <item name="android:textSize">@dimen/mediumText</item>
+    </style>
+
+    <style name="InfoText">
+        <item name="android:layout_width">wrap_content</item>
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:textColor">@color/light_gray</item>
+        <item name="android:textSize">@dimen/smallText</item>
+    </style>
+
+    <style name="TweetText">
+        <item name="android:layout_width">wrap_content</item>
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:textColor">@color/dark_gray</item>
+        <item name="android:autoLink">all</item>
+        <item name="android:textSize">@dimen/mediumText</item>
+        <item name="android:linksClickable">true</item>
+        <item name="android:layout_marginTop">10dp</item>
+    </style>
+
+    <style name="TweetComposeText">
+        <item name="android:layout_width">match_parent</item>
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:textColor">@color/dark_gray</item>
+        <item name="android:textSize">@dimen/mediumText</item>
+        <item name="android:background">@android:color/transparent</item>
+        <item name="android:gravity">top|left</item>
+        <item name="android:inputType">textMultiLine</item>
+        <item name="android:scrollHorizontally">false</item>
+    </style>
+
+    <style name="TweetButton">
+        <item name="android:layout_width">wrap_content</item>
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:background">@drawable/button_twitter</item>
+        <item name="android:minHeight">0dp</item>
+        <item name="android:minWidth">0dp</item>
+        <item name="android:paddingBottom">7dp</item>
+        <item name="android:paddingTop">7dp</item>
+        <item name="android:paddingLeft">15dp</item>
+        <item name="android:paddingRight">15dp</item>
+        <item name="android:textAllCaps">false</item>
+        <item name="android:textColor">@android:color/white</item>
+    </style>
+
+    <style name="ItemActionButton">
+        <item name="android:layout_width">@dimen/item_action_button_size</item>
+        <item name="android:layout_height">@dimen/item_action_button_size</item>
+    </style>
+
+    <style name="DetailActionButton">
+        <item name="android:layout_width">@dimen/detail_action_button_size</item>
+        <item name="android:layout_height">@dimen/detail_action_button_size</item>
+    </style>
+
+    <style name="HorizontalLine">
+        <item name="android:layout_width">match_parent</item>
+        <item name="android:layout_height">1dp</item>
+        <item name="android:background">@color/extra_light_gray</item>
+        <item name="android:layout_marginTop">10dp</item>
+        <item name="android:layout_marginBottom">10dp</item>
+        <item name="android:layout_alignParentLeft">true</item>
+    </style>
+
 </resources>
