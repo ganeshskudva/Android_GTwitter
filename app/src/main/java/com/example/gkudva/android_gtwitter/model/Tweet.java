@@ -97,6 +97,95 @@ public class Tweet extends Model implements JSONSerializable {
         }
     }
 
+    public static String getTAG() {
+        return TAG;
+    }
+
+    public String getText() {
+        return text;
+    }
+
+    public String getCreatedAt() {
+        return createdAt;
+    }
+
+    public String getDisplayTimestamp() {
+        return displayTimestamp;
+    }
+
+    public boolean isFavorited() {
+        return favorited;
+    }
+
+    public int getFavoriteCount() {
+        return favoriteCount;
+    }
+
+    public boolean isRetweeted() {
+        return retweeted;
+    }
+
+    public int getRetweetCount() {
+        return retweetCount;
+    }
+
+    public String getReplyTweet() {
+        return replyTweet;
+    }
+
+    public User getUser() {
+        return user;
+    }
+
+    public Media getMedia() {
+        return media;
+    }
+
+    public void setId(long id) {
+
+        this.id = id;
+    }
+
+    public void setText(String text) {
+        this.text = text;
+    }
+
+    public void setCreatedAt(String createdAt) {
+        this.createdAt = createdAt;
+    }
+
+    public void setDisplayTimestamp(String displayTimestamp) {
+        this.displayTimestamp = displayTimestamp;
+    }
+
+    public void setFavorited(boolean favorited) {
+        this.favorited = favorited;
+    }
+
+    public void setFavoriteCount(int favoriteCount) {
+        this.favoriteCount = favoriteCount;
+    }
+
+    public void setRetweeted(boolean retweeted) {
+        this.retweeted = retweeted;
+    }
+
+    public void setRetweetCount(int retweetCount) {
+        this.retweetCount = retweetCount;
+    }
+
+    public void setReplyTweet(String replyTweet) {
+        this.replyTweet = replyTweet;
+    }
+
+    public void setUser(User user) {
+        this.user = user;
+    }
+
+    public void setMedia(Media media) {
+        this.media = media;
+    }
+
     private void setDisplayTimestamp() {
         String relativeTimestamp = DateUtil.getRelativeTimeAgo(createdAt);
         // hacky - remove 'ago' then only grab the first letter of the time

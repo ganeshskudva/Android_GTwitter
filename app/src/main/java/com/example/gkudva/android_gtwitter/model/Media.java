@@ -70,5 +70,57 @@ public class Media extends Model implements JSONSerializable {
 
         return str.toString();
     }
+
+    public String getMediaUrl() {
+        return mediaUrl;
+    }
+
+    public String getUrl() {
+        return url;
+    }
+
+    public String getType() {
+        return type;
+    }
+
+    public int getWidth() {
+        return width;
+    }
+
+    public int getHeight() {
+        return height;
+    }
+
+    public String getResizeStr() {
+        return resizeStr;
+    }
+
+    public void setId(long id) {
+        this.id = id;
+    }
+
+    public void setMediaUrl(String mediaUrl) {
+        this.mediaUrl = mediaUrl;
+    }
+
+    public void setUrl(String url) {
+        this.url = url;
+    }
+
+    public void setType(String type) {
+        this.type = type;
+    }
+
+    public void setWidth(int width) {
+        this.width = width;
+    }
+
+    public void setHeight(int height) {
+        this.height = height;
+    }
+
+    public void setResizeStr(String resizeStr) {
+        this.resizeStr = resizeStr;
+    }
 }
 

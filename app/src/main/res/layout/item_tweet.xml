@@ -52,20 +52,11 @@
         android:text="@{tweet.text}"
         tools:text="Hello there"/>
 
-    <ImageView
-        android:id="@+id/ivMedia"
-        android:layout_width="match_parent"
-        android:layout_height="150dp"
-        android:layout_alignLeft="@+id/tvText"
-        android:layout_below="@+id/tvText"
-        android:layout_marginTop="10dp"/>
-
-
     <Button
         android:id="@+id/btReply"
         style="@style/ItemActionButton"
         android:layout_alignLeft="@+id/tvName"
-        android:layout_below="@+id/ivMedia"
+        android:layout_below="@+id/tvText"
         android:layout_marginTop="20dp"
         android:background="@drawable/reply"/>
 
