@@ -22,4 +22,13 @@
     <string name="sample_tweet_body"><![CDATA[Learn how @BAPS encourages civic participation & dialogue with elected officials and public servants in the US by following @BAPS_PubAffairs]]></string>
     <string name="title_activity_timeline">TimelineActivity</string>
 
+    <string name="close">Close</string>
+    <string name="tweet">Tweet</string>
+    <string name="tweetLimit">140</string>
+    <string name="statusHint">What\'s happening?</string>
+    <string name="reply">Reply</string>
+    <string name="replyTo">Reply to \</string>
+    <string name="retweet">Retweets</string>
+    <string name="likes">Likes</string>
+
 </resources>

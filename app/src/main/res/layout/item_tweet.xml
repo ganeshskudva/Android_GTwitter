@@ -1,95 +1,112 @@
 <?xml version="1.0" encoding="utf-8"?>
-<RelativeLayout
-    xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:tools="http://schemas.android.com/tools"
-    android:layout_width="match_parent"
-    android:layout_height="wrap_content"
-    android:padding="10dp">
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools">
 
-    <ImageView
-        android:id="@+id/ivProfilePhoto"
-        style="@style/ProfilePhoto"
-        android:layout_alignParentLeft="true"
-        android:layout_alignParentStart="true"
-        android:layout_alignParentTop="true"
-        android:layout_marginRight="10dp"
-        tools:src="@drawable/twitter_logo_white_on_blue"/>
+    <data>
 
-    <TextView
-        android:id="@+id/tvName"
-        style="@style/BoldPrimaryText"
-        android:layout_alignParentTop="true"
-        android:layout_toEndOf="@+id/ivProfilePhoto"
-        android:layout_toRightOf="@+id/ivProfilePhoto"
-        />
+        <import type="android.view.View"/>
 
-    <TextView
-        android:id="@+id/tvScreenName"
-        style="@style/SecondaryText"
-        android:layout_alignTop="@+id/tvName"
-        android:layout_marginLeft="7dp"
-        android:layout_toEndOf="@+id/tvName"
-        android:layout_toRightOf="@+id/tvName"
-        />
+        <variable
+            name="tweet"
+            type="com.example.gkudva.android_gtwitter.model.Tweet"/>
+    </data>
 
-    <TextView
-        android:id="@+id/tvTimestamp"
-        style="@style/InfoText"
-        android:layout_alignParentEnd="true"
-        android:layout_alignParentRight="true"
-        android:layout_alignTop="@+id/tvName"
-        tools:text="7h"/>
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:padding="10dp">
 
-    <TextView
-        android:id="@+id/tvText"
-        style="@style/TweetText"
-        android:layout_below="@+id/tvName"
-        android:layout_toEndOf="@+id/ivProfilePhoto"
-        android:layout_toRightOf="@+id/ivProfilePhoto"
-        tools:text="Hello there"/>
+        <ImageView
+            android:id="@+id/ivProfilePhoto"
+            style="@style/ProfilePhoto"
+            android:layout_alignParentLeft="true"
+            android:layout_alignParentStart="true"
+            android:layout_alignParentTop="true"
+            android:layout_marginRight="10dp"
+            tools:src="@drawable/twitter_logo_white_on_blue"/>
 
-    <Button
-        android:id="@+id/btReply"
-        style="@style/ItemActionButton"
-        android:layout_alignLeft="@+id/tvName"
-        android:layout_below="@+id/tvText"
-        android:layout_marginTop="20dp"
-        android:background="@drawable/reply"/>
+        <TextView
+            android:id="@+id/tvName"
+            style="@style/BoldPrimaryText"
+            android:layout_alignParentTop="true"
+            android:layout_toEndOf="@+id/ivProfilePhoto"
+            android:layout_toRightOf="@+id/ivProfilePhoto"
+            android:text="@{tweet.user.name}"
+            tools:text="Dianne Bautista"/>
 
-    <Button
-        android:id="@+id/btRetweet"
-        style="@style/ItemActionButton"
-        android:layout_alignTop="@+id/btReply"
-        android:layout_marginLeft="30dp"
-        android:layout_toEndOf="@+id/btReply"
-        android:layout_toRightOf="@+id/btReply"
-        android:background="@drawable/retweet"/>
+        <TextView
+            android:id="@+id/tvScreenName"
+            style="@style/SecondaryText"
+            android:layout_alignTop="@+id/tvName"
+            android:layout_marginLeft="7dp"
+            android:layout_toEndOf="@+id/tvName"
+            android:layout_toRightOf="@+id/tvName"
+            android:text="@{tweet.user.screenName}"
+            tools:text="\@dianne_askew"/>
 
-    <TextView
-        android:id="@+id/tvRetweetCount"
-        style="@style/InfoText"
-        android:layout_alignTop="@+id/btRetweet"
-        android:layout_marginLeft="5dp"
-        android:layout_toEndOf="@+id/btRetweet"
-        android:layout_toRightOf="@+id/btRetweet"
-        tools:text="15"/>
+        <TextView
+            android:id="@+id/tvTimestamp"
+            style="@style/InfoText"
+            android:layout_alignParentEnd="true"
+            android:layout_alignParentRight="true"
+            android:layout_alignTop="@+id/tvName"
+            android:text="@{tweet.displayTimestamp}"
+            tools:text="7h"/>
 
-    <Button
-        android:id="@+id/btFavorite"
-        style="@style/ItemActionButton"
-        android:layout_alignTop="@+id/btReply"
-        android:layout_marginLeft="30dp"
-        android:layout_toEndOf="@+id/tvRetweetCount"
-        android:layout_toRightOf="@+id/tvRetweetCount"
-        android:background="@drawable/favorite"/>
+        <TextView
+            android:id="@+id/tvText"
+            style="@style/TweetText"
+            android:layout_below="@+id/tvName"
+            android:layout_toEndOf="@+id/ivProfilePhoto"
+            android:layout_toRightOf="@+id/ivProfilePhoto"
+            android:text="@{tweet.text}"
+            tools:text="Hello there"/>
 
-    <TextView
-        android:id="@+id/tvFavoriteCount"
-        style="@style/InfoText"
-        android:layout_alignTop="@+id/btFavorite"
-        android:layout_marginLeft="5dp"
-        android:layout_toEndOf="@+id/btFavorite"
-        android:layout_toRightOf="@+id/btFavorite"
-        tools:text="15"/>
+        <Button
+            android:id="@+id/btReply"
+            style="@style/ItemActionButton"
+            android:layout_alignLeft="@+id/tvName"
+            android:layout_below="@+id/tvText"
+            android:layout_marginTop="20dp"
+            android:background="@drawable/reply"/>
 
-</RelativeLayout>
+        <Button
+            android:id="@+id/btRetweet"
+            style="@style/ItemActionButton"
+            android:layout_alignTop="@+id/btReply"
+            android:layout_marginLeft="30dp"
+            android:layout_toEndOf="@+id/btReply"
+            android:layout_toRightOf="@+id/btReply"
+            android:background="@drawable/retweet"/>
+
+        <TextView
+            android:id="@+id/tvRetweetCount"
+            style="@style/InfoText"
+            android:layout_alignTop="@+id/btRetweet"
+            android:layout_marginLeft="5dp"
+            android:layout_toEndOf="@+id/btRetweet"
+            android:layout_toRightOf="@+id/btRetweet"
+            android:text="@{Integer.toString(tweet.retweetCount)}"
+            tools:text="15"/>
+
+        <Button
+            android:id="@+id/btFavorite"
+            style="@style/ItemActionButton"
+            android:layout_alignTop="@+id/btReply"
+            android:layout_marginLeft="30dp"
+            android:layout_toEndOf="@+id/tvRetweetCount"
+            android:layout_toRightOf="@+id/tvRetweetCount"
+            android:background="@drawable/favorite"/>
+
+        <TextView
+            android:id="@+id/tvFavoriteCount"
+            style="@style/InfoText"
+            android:layout_alignTop="@+id/btFavorite"
+            android:layout_marginLeft="5dp"
+            android:layout_toEndOf="@+id/btFavorite"
+            android:layout_toRightOf="@+id/btFavorite"
+            android:text="@{Integer.toString(tweet.favoriteCount)}"
+            tools:text="15"/>
+
+    </RelativeLayout>
+</layout>

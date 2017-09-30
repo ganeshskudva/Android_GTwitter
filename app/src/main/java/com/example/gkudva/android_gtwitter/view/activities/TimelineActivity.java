@@ -1,8 +1,9 @@
 package com.example.gkudva.android_gtwitter.view.activities;
 
-import android.content.Context;
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
+import android.support.v4.app.FragmentManager;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
@@ -11,47 +12,54 @@ import android.util.Log;
 import android.view.View;
 
 import com.example.gkudva.android_gtwitter.R;
+import com.example.gkudva.android_gtwitter.TwitterApplication;
 import com.example.gkudva.android_gtwitter.model.Tweet;
-import com.example.gkudva.android_gtwitter.presenter.TimelinePresenter;
+import com.example.gkudva.android_gtwitter.model.TweetManager;
+import com.example.gkudva.android_gtwitter.model.User;
+import com.example.gkudva.android_gtwitter.util.AppConstants;
 import com.example.gkudva.android_gtwitter.util.DividerItemDecoration;
 import com.example.gkudva.android_gtwitter.util.EndlessRecyclerViewScrollListener;
-import com.example.gkudva.android_gtwitter.util.InfoMessage;
-import com.example.gkudva.android_gtwitter.util.SpacesItemDecoration;
-import com.example.gkudva.android_gtwitter.view.TimelineMvpView;
+import com.example.gkudva.android_gtwitter.util.ItemClickSupport;
+import com.example.gkudva.android_gtwitter.util.JSONDeserializer;
+import com.example.gkudva.android_gtwitter.util.NetworkUtil;
+import com.example.gkudva.android_gtwitter.util.TwitterClient;
+import com.example.gkudva.android_gtwitter.util.ErrorHandler;
 import com.example.gkudva.android_gtwitter.view.adapter.TweetsAdapter;
+import com.example.gkudva.android_gtwitter.view.fragment.ComposeDialogFragment;
+import com.loopj.android.http.JsonHttpResponseHandler;
 
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
+import org.parceler.Parcels;
+
+import java.util.ArrayList;
 import java.util.List;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
+import butterknife.OnClick;
+import cz.msebera.android.httpclient.Header;
 
-import static com.example.gkudva.android_gtwitter.R.id.swipeContainer;
+public class TimelineActivity extends AppCompatActivity implements ComposeDialogFragment.ComposeDialogListener {
+    private static final String TAG = TimelineActivity.class.getSimpleName();
 
-public class TimelineActivity extends AppCompatActivity implements TimelineMvpView,SwipeRefreshLayout.OnRefreshListener{
-
-    private TimelinePresenter presenter;
-    private TweetsAdapter mAdapter;
-    private List<Tweet> mTweetList;
-    private InfoMessage mInfoMessage;
-    private EndlessRecyclerViewScrollListener endlessRecyclerViewScrollListener;
-
-    private static final String TAG = "Timeline Activity";
-
-    @BindView(swipeContainer)
-    SwipeRefreshLayout swipeRefreshLayout;
+    @BindView(R.id.swipeContainer)
+    SwipeRefreshLayout swipeContainer;
     @BindView(R.id.rvTweets)
     RecyclerView rvTweets;
     @BindView(R.id.fabComposeTweet)
     FloatingActionButton fabComposeTweet;
 
+    private TwitterClient mClient;
+    private TweetManager mTweetManager;
+    private TweetsAdapter mAdapter;
+    private List<Tweet> mTweetList;
+    private User mCurrentUser;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-
-        presenter = new TimelinePresenter();
-        presenter.attachView(this);
-
         setContentView(R.layout.activity_timeline);
         ButterKnife.bind(this);
 
@@ -59,136 +67,190 @@ public class TimelineActivity extends AppCompatActivity implements TimelineMvpVi
             getSupportActionBar().setDisplayShowHomeEnabled(true);
         }
 
-        mInfoMessage = new InfoMessage(this);
-
-        setupRecyclerView(rvTweets);
-
-        setUserInfo(presenter.getCurrentUser());
-        swipeRefreshLayout.setOnRefreshListener(this);
-        presenter.initTweetList();
-
+        mClient = TwitterApplication.getRestClient();
+        mTweetManager = TweetManager.getInstance();
+        setCurrentUser();
+        initSwipeRefreshLayout();
+        initTweetList();
     }
 
-    private void setUserInfo(String usrname) {
-        Log.d(TAG, "User: " + usrname);
-        getSupportActionBar().setTitle(usrname);
-    }
-
-    @Override
-    public void onRefresh() {
-        presenter.populateTimeline(-1);
-    //    swipeRefreshLayout.setRefreshing(false);
-    }
-
-    @Override
-    protected void onDestroy() {
-        presenter.detachView();
-        super.onDestroy();
-    }
-
-    @Override
-    protected void onPause()
-    {
-        super.onPause();
-    }
-
-    @Override
-    public Context getContext() {
-        return this;
-    }
-
-    @Override
-    public void showMessage(String message) {
-        rvTweets.setVisibility(View.INVISIBLE);
-        mInfoMessage.showMessage(message);
-    }
-
-    @Override
-    public void showTimeline(int curSize, int listSize, List<Tweet> timelineList) {
-        TweetsAdapter adapter = (TweetsAdapter) rvTweets.getAdapter();
-        adapter.setTimelineList(timelineList);
-/*
-        if (curSize == 0)
-        {
-            adapter.notifyItemRangeRemoved(curSize, listSize);
-        }
-        else
-        {
-           adapter.notifyItemRangeInserted(curSize, listSize);
-        }
-*/
-        adapter.notifyDataSetChanged();
-    //    rvTweets.requestFocus();
-    //    rvTweets.setVisibility(View.VISIBLE);
-    }
-
-    @Override
-    public void handleSwipeRefresh() {
-        if (swipeRefreshLayout.isRefreshing()) {
-            swipeRefreshLayout.setRefreshing(false);
-        }
-    }
-
-    private void setupRecyclerView(RecyclerView recyclerView) {
-        TweetsAdapter adapter = new TweetsAdapter(this);
-    /*
-        adapter.setCallback(new NYTAdapter.CallbackListener() {
+    private void initSwipeRefreshLayout() {
+        swipeContainer.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
             @Override
-            public void onItemClick(Doc article) {
-                Intent intent = new Intent(getApplicationContext(), WebViewActivity.class);
-                intent.putExtra("Article", Parcels.wrap(article));
-                startActivity(intent);
+            public void onRefresh() {
+                populateTimeline(-1);
             }
-
         });
-    */
 
-        final int ydy = 0;
-        final LinearLayoutManager layoutManager = new LinearLayoutManager(this);
-        layoutManager.setOrientation(LinearLayoutManager.VERTICAL);
-        recyclerView.setLayoutManager(layoutManager);
-        recyclerView.setAdapter(adapter);
+        // Configure the refreshing colors
+        swipeContainer.setColorSchemeResources(R.color.primary,
+                R.color.primary_dark,
+                R.color.light_gray,
+                R.color.extra_light_gray);
 
-        recyclerView.addOnScrollListener(endlessRecyclerViewScrollListener);
-        recyclerView.addItemDecoration(new SpacesItemDecoration(20));
+    }
+
+    private void initTweetList() {
+        mTweetList = new ArrayList<>();
+        mAdapter = new TweetsAdapter(this, mTweetList);
+        LinearLayoutManager linearLayoutManager = new LinearLayoutManager(this);
+        rvTweets.setLayoutManager(linearLayoutManager);
+        rvTweets.setAdapter(mAdapter);
 
         RecyclerView.ItemDecoration itemDecoration = new
                 DividerItemDecoration(this, DividerItemDecoration.VERTICAL_LIST);
-        recyclerView.addItemDecoration(itemDecoration);
-        recyclerView.addOnScrollListener(new EndlessRecyclerViewScrollListener(layoutManager) {
+        rvTweets.addItemDecoration(itemDecoration);
+        rvTweets.addOnScrollListener(new EndlessRecyclerViewScrollListener(linearLayoutManager) {
             @Override
             public void onLoadMore(int page, int totalItemsCount) {
                 customLoadMoreDataFromApi(page);
             }
-
-            @Override
-            public void onScrolled(RecyclerView recyclerView, int dx, int dy) {
-                super.onScrolled(recyclerView, dx, dy);
-                int offset = dy ;//- ydy;
-                //ydy = dy;
-                boolean shouldRefresh = (layoutManager.findFirstCompletelyVisibleItemPosition() == 0)
-                        && (recyclerView.getScrollState() == RecyclerView.SCROLL_STATE_DRAGGING) && offset > 30;
-                if (shouldRefresh) {
-                    //swipeRefreshLayout.setRefreshing(true);
-                    //Refresh to load data here.
-                    return;
-                }
-                boolean shouldPullUpRefresh = layoutManager.findLastCompletelyVisibleItemPosition() == layoutManager.getChildCount() - 1
-                        && recyclerView.getScrollState() == RecyclerView.SCROLL_STATE_DRAGGING && offset < -30;
-                if (shouldPullUpRefresh) {
-                    //swipeRefreshLayout.setRefreshing(true);
-                    //refresh to load data here.
-                    return;
-                }
-                swipeRefreshLayout.setRefreshing(true);
-            }
         });
 
+        ItemClickSupport.addTo(rvTweets).setOnItemClickListener(
+                new ItemClickSupport.OnItemClickListener() {
+                    @Override
+                    public void onItemClicked(RecyclerView recyclerView, int position, View v) {
+                        Tweet tweet = mTweetList.get(position);
+                        Intent intent = new Intent(TimelineActivity.this, TweetDetailActivity.class);
+                        intent.putExtra(AppConstants.TWEET_EXTRA, Parcels.wrap(tweet));
+                        startActivity(intent);
+                    }
+                });
+
+        if (!NetworkUtil.isOnline()) {
+            List<Tweet> offlineTweetList = mTweetManager.getStoredTweetList();
+            if (offlineTweetList != null) {
+                mTweetList.addAll(offlineTweetList);
+                mAdapter.notifyItemRangeInserted(0, offlineTweetList.size());
+            }
+        } else {
+            populateTimeline(-1);
+        }
     }
 
     private void customLoadMoreDataFromApi(int page) {
         // Returns results with an ID less than (that is, older than) or equal to the specified ID.
         long maxId = mTweetList.get(mTweetList.size() - 1).id - 1;
-        presenter.populateTimeline(maxId);
+        populateTimeline(maxId);
+    }
+
+    // Send an API request to get the timeline JSON
+    // Fill the listview by creating the tweet objects from JSON
+    private void populateTimeline(final long maxId) {
+        mClient.getHomeTimeline(maxId, new JsonHttpResponseHandler() {
+            @Override
+            public void onSuccess(int statusCode, Header[] headers, JSONArray response) {
+                Log.d(TAG, "populateTimeline onSuccess: " + response.toString());
+                try {
+                    JSONDeserializer<Tweet> deserializer = new JSONDeserializer<>(Tweet.class);
+                    List<Tweet> tweetResponseList = deserializer.fromJSONArrayToList(response);
+                    if (tweetResponseList != null) {
+                        Log.d(TAG, "tweet size: " + tweetResponseList.size());
+                        if (maxId == -1) {
+                            int listSize = mTweetList.size();
+                            mTweetList.clear();
+                            mAdapter.notifyItemRangeRemoved(0, listSize);
+
+                            mTweetManager.clearTweetList();
+                        }
+
+                        int curSize = mTweetList.size();
+                        mTweetList.addAll(tweetResponseList);
+                        mAdapter.notifyItemRangeInserted(curSize, tweetResponseList.size());
+
+                        mTweetManager.storeTweetList(mTweetList);
+                    }
+                } catch (JSONException e) {
+                    ErrorHandler.handleAppException(e, "Exception from populating Twitter timeline");
+                }
+
+                handleSwipeRefresh();
+            }
+
+            @Override
+            public void onFailure(int statusCode, Header[] headers, Throwable throwable, JSONObject errorResponse) {
+                handleSwipeRefresh();
+                if (errorResponse != null) {
+                    ErrorHandler.logAppError(errorResponse.toString());
+                }
+
+                ErrorHandler.displayError(TimelineActivity.this, AppConstants.DEFAULT_ERROR_MESSAGE);
+            }
+        });
+    }
+
+    private void handleSwipeRefresh() {
+        if (swipeContainer.isRefreshing()) {
+            swipeContainer.setRefreshing(false);
+        }
+    }
+
+
+    private void setCurrentUser() {
+        mCurrentUser = User.getExistingUser();
+        if (mCurrentUser != null) {
+            Log.d(TAG, "Existing user from DB");
+            setUserInfo();
+        } else {
+            getUser();
+        }
+    }
+
+    private void setUserInfo() {
+        Log.d(TAG, "User: " + mCurrentUser.toString());
+        getSupportActionBar().setTitle(mCurrentUser.screenName);
+    }
+
+    private void getUser() {
+        Log.d(TAG, "Fetching user from the server");
+
+        mClient.getUser(new JsonHttpResponseHandler() {
+            @Override
+            public void onSuccess(int statusCode, Header[] headers, JSONObject response) {
+                Log.d(TAG, "getUser onSuccess: " + response.toString());
+                JSONDeserializer<User> deserializer = new JSONDeserializer<>(User.class);
+                mCurrentUser = deserializer.configureJSONObject(response);
+                if (mCurrentUser == null) {
+                    ErrorHandler.logAppError("current user is NULL");
+                } else {
+                    User.saveUser(mCurrentUser);
+                    setUserInfo();
+                }
+            }
+
+            @Override
+            public void onFailure(int statusCode, Header[] headers, String responseString, Throwable throwable) {
+                ErrorHandler.logAppError("getUser onFailure1: " + responseString);
+            }
+
+            @Override
+            public void onFailure(int statusCode, Header[] headers, Throwable throwable, JSONObject errorResponse) {
+                ErrorHandler.logAppError("getUser onFailure2: " + errorResponse.toString());
+            }
+
+            @Override
+            public void onFailure(int statusCode, Header[] headers, Throwable throwable, JSONArray errorResponse) {
+                ErrorHandler.logAppError("getUser onFailure3");
+            }
+        });
+    }
+
+    @OnClick(R.id.fabComposeTweet)
+    public void composeTweet() {
+        FragmentManager fm = getSupportFragmentManager();
+        ComposeDialogFragment composeDialogFragment = ComposeDialogFragment.newInstance(mCurrentUser);
+        composeDialogFragment.show(fm, "fragment_compose");
+    }
+
+    @Override
+    public void onUpdateStatusSuccess(Tweet status) {
+        Log.d(TAG, "Compose tweet success: " + status.text);
+        if (status != null) {
+            // Add to the beginning of the list and scroll to the top
+            mTweetList.add(0, status);
+            mAdapter.notifyItemInserted(0);
+            rvTweets.scrollToPosition(0);
+        }
     }
 }

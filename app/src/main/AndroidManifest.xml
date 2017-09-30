@@ -15,25 +15,26 @@
         android:roundIcon="@mipmap/ic_launcher_twitter_round"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
-
         <meta-data
             android:name="AA_DB_NAME"
-            android:value="RestClient.db"/>
+            android:value="RestClient.db" />
         <meta-data
             android:name="AA_DB_VERSION"
-            android:value="2"/>
+            android:value="2" />
         <meta-data
             android:name="AA_MODELS"
-            android:value="com.example.gkudva.android_gtwitter.model.Media, com.example.gkudva.android_gtwitter.model.User, com.example.gkudva.android_gtwitter.model.Tweet"/>
+            android:value="com.example.gkudva.android_gtwitter.model.Media, com.example.gkudva.android_gtwitter.model.User, com.example.gkudva.android_gtwitter.model.Tweet" />
 
-        <activity android:name=".view.activities.SplashActivity">
+        <activity android:name=".view.activities.SplashActivity"
+            android:theme="@style/AppTheme.NoActionBar">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <activity android:name=".view.activities.LoginActivity">
+        <activity android:name=".view.activities.LoginActivity"
+            android:theme="@style/AppTheme.NoActionBar" >
             <intent-filter>
                 <action android:name="android.intent.action.VIEW" />
 
@@ -47,8 +48,8 @@
         </activity>
         <activity
             android:name=".view.activities.TimelineActivity"
-            android:label="@string/title_activity_timeline">
-        </activity>
+            android:label="@string/title_activity_timeline"></activity>
+        <activity android:name=".view.activities.TweetDetailActivity"></activity>
     </application>
 
 </manifest>
