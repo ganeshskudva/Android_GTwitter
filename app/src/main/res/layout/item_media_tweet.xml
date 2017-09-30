@@ -32,7 +32,7 @@
             android:layout_toEndOf="@+id/ivProfilePhoto"
             android:layout_toRightOf="@+id/ivProfilePhoto"
             android:text="@{tweet.user.name}"
-            tools:text="Dianne Bautista"/>
+        />
 
         <TextView
             android:id="@+id/tvScreenName"
@@ -42,7 +42,7 @@
             android:layout_toEndOf="@+id/tvName"
             android:layout_toRightOf="@+id/tvName"
             android:text="@{tweet.user.screenName}"
-            tools:text="\@dianne_askew"/>
+        />
 
         <TextView
             android:id="@+id/tvTimestamp"
