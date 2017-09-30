@@ -10,9 +10,9 @@ import java.util.List;
 
 public interface TimelineMvpView extends MvpView {
 
-    void showTimeline(List<Tweet> timelineList);
+    void showTimeline(int curSize, int listSize, List<Tweet> timelineList);
 
     void showMessage(String message);
 
-//    void showProgressIndicator();
+    void handleSwipeRefresh();
 }

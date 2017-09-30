@@ -26,7 +26,7 @@ import butterknife.ButterKnife;
  * Created by gkudva on 28/09/17.
  */
 
-public class TweetsAdapter extends RecyclerView.Adapter<TweetsAdapter.ViewHolder> {
+public class TweetsAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
     private static final String TAG = TweetsAdapter.class.getSimpleName();
     public static final int TYPE_TWEET = 0;
     public static final int TYPE_TWEET_MEDIA = 1;
@@ -61,8 +61,8 @@ public class TweetsAdapter extends RecyclerView.Adapter<TweetsAdapter.ViewHolder
     }
 
     @Override
-    public TweetsAdapter.ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
-        ViewHolder viewHolder;
+    public RecyclerView.ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
+        RecyclerView.ViewHolder viewHolder;
 
         if (viewType == TYPE_TWEET) {
             View view = LayoutInflater.from(parent.getContext())
@@ -78,13 +78,14 @@ public class TweetsAdapter extends RecyclerView.Adapter<TweetsAdapter.ViewHolder
     }
 
     @Override
-    public void onBindViewHolder(TweetsAdapter.ViewHolder holder, int position) {
+    public void onBindViewHolder(RecyclerView.ViewHolder holder, int position) {
 
         Tweet tweet = mTweetList.get(position);
         Log.d(TAG, "tweet[" + position + "]:\n" + tweet.toString());
 
         int type = getItemViewType(position);
-        if (type == TYPE_TWEET) {
+     //   if (type == TYPE_TWEET) {
+        if (holder instanceof TweetViewHolder) {
             TweetViewHolder tweetViewHolder = (TweetViewHolder) holder;
             tweetViewHolder.configureViewwithTweet(tweet);
         } else {
@@ -98,21 +99,8 @@ public class TweetsAdapter extends RecyclerView.Adapter<TweetsAdapter.ViewHolder
         return mTweetList.size();
     }
 
-    public static class ViewHolder extends RecyclerView.ViewHolder {
-        @BindView(R.id.ivProfilePhoto)
-        ImageView ivProfilePhoto;
-        @BindView(R.id.btFavorite)
-        Button btFavorite;
-        @BindView(R.id.btRetweet)
-        Button btRetweet;
 
-        public ViewHolder(View itemView) {
-            super(itemView);
-            ButterKnife.bind(this, itemView);
-        }
-    }
-
-    public class TweetViewHolder extends ViewHolder {
+    public class TweetViewHolder extends RecyclerView.ViewHolder {
 
         @BindView(R.id.ivProfilePhoto)
         ImageView ivProfilePhoto;
@@ -146,8 +134,8 @@ public class TweetsAdapter extends RecyclerView.Adapter<TweetsAdapter.ViewHolder
             tvScreenName.setText(tweet.getUser().getScreenName());
             tvTimeStamp.setText(tweet.getDisplayTimestamp());
             tvText.setText(tweet.getText());
-            tvRetweetCount.setText(tweet.getRetweetCount());
-            tvFavoriteCount.setText(tweet.getRetweetCount());
+            tvRetweetCount.setText(Integer.toString(tweet.getRetweetCount()));
+            tvFavoriteCount.setText(Integer.toString(tweet.getRetweetCount()));
 
             if (TextUtils.isEmpty(tweet.getUser().getProfileImageUrl()))
             {
@@ -179,7 +167,7 @@ public class TweetsAdapter extends RecyclerView.Adapter<TweetsAdapter.ViewHolder
 
     }
 
-    public class TweetMediaViewHolder extends ViewHolder {
+    public class TweetMediaViewHolder extends RecyclerView.ViewHolder {
         @BindView(R.id.ivProfilePhoto)
         ImageView ivProfilePhoto;
         @BindView(R.id.tvName)
@@ -214,8 +202,8 @@ public class TweetsAdapter extends RecyclerView.Adapter<TweetsAdapter.ViewHolder
             tvScreenName.setText(tweet.getUser().getScreenName());
             tvTimeStamp.setText(tweet.getDisplayTimestamp());
             tvText.setText(tweet.getText());
-            tvRetweetCount.setText(tweet.getRetweetCount());
-            tvFavoriteCount.setText(tweet.getRetweetCount());
+            tvRetweetCount.setText(Integer.toString(tweet.getRetweetCount()));
+            tvFavoriteCount.setText(Integer.toString(tweet.getRetweetCount()));
 
             if (TextUtils.isEmpty(tweet.getUser().getProfileImageUrl()))
             {

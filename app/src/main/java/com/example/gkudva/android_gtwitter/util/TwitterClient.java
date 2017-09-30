@@ -20,6 +20,7 @@ public class TwitterClient extends OAuthBaseClient {
     public static final String REST_CONSUMER_KEY = "vj6uxhD1HkgiXder1W2BpWn41";       // Change this
     public static final String REST_CONSUMER_SECRET = "P8FRqaXMSnxKkCkDuI6mNKmGMbWpkJirbyDUh6kLuQxorxFmUk"; // Change this
     public static final String REST_CALLBACK_URL = "oauth://twitterclient"; // Change this (here and in manifest)
+    public static final int TWEET_FETCH_COUNT = 20;
 
     /*
     public TwitterClient(Context context) {
@@ -60,14 +61,18 @@ public class TwitterClient extends OAuthBaseClient {
 	 *    i.e client.post(apiUrl, params, handler);
 	 */
 
-    public void getHomeTimeline(int page, String max_id, AsyncHttpResponseHandler handler) {
+    // HomeTimeline - Gets us the home timeline
+    // GET statuses/home_timeline.json
+    public void getHomeTimeline(long maxId, AsyncHttpResponseHandler handler) {
+        //Log.d(TAG, "------getHomeTimeline = max_id: " + maxId);
+
         String apiUrl = getApiUrl("statuses/home_timeline.json");
         RequestParams params = new RequestParams();
-        params.put("count", String.valueOf(page));
-        params.put("since_id", 1);
-        if (max_id != null)
-        {
-            //  params.put("max_id", Long.parseLong(max_id));
+        params.put("count", TWEET_FETCH_COUNT);
+        if (maxId != -1) {
+            params.put("max_id", maxId);
+        } else {
+            params.put("since_id", 1);
         }
         getClient().get(apiUrl, params, handler);
     }

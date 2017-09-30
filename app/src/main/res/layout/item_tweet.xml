@@ -21,8 +21,7 @@
         android:layout_alignParentTop="true"
         android:layout_toEndOf="@+id/ivProfilePhoto"
         android:layout_toRightOf="@+id/ivProfilePhoto"
-        android:text="@{tweet.user.name}"
-        tools:text="Dianne Bautista"/>
+        />
 
     <TextView
         android:id="@+id/tvScreenName"
@@ -31,8 +30,7 @@
         android:layout_marginLeft="7dp"
         android:layout_toEndOf="@+id/tvName"
         android:layout_toRightOf="@+id/tvName"
-        android:text="@{tweet.user.screenName}"
-        tools:text="\@dianne_askew"/>
+        />
 
     <TextView
         android:id="@+id/tvTimestamp"
@@ -40,7 +38,6 @@
         android:layout_alignParentEnd="true"
         android:layout_alignParentRight="true"
         android:layout_alignTop="@+id/tvName"
-        android:text="@{tweet.displayTimestamp}"
         tools:text="7h"/>
 
     <TextView
@@ -49,7 +46,6 @@
         android:layout_below="@+id/tvName"
         android:layout_toEndOf="@+id/ivProfilePhoto"
         android:layout_toRightOf="@+id/ivProfilePhoto"
-        android:text="@{tweet.text}"
         tools:text="Hello there"/>
 
     <Button
@@ -76,7 +72,6 @@
         android:layout_marginLeft="5dp"
         android:layout_toEndOf="@+id/btRetweet"
         android:layout_toRightOf="@+id/btRetweet"
-        android:text="@{Integer.toString(tweet.retweetCount)}"
         tools:text="15"/>
 
     <Button
@@ -95,7 +90,6 @@
         android:layout_marginLeft="5dp"
         android:layout_toEndOf="@+id/btFavorite"
         android:layout_toRightOf="@+id/btFavorite"
-        android:text="@{Integer.toString(tweet.favoriteCount)}"
         tools:text="15"/>
 
 </RelativeLayout>

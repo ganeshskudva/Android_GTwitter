@@ -12,13 +12,11 @@ import android.view.View;
 
 import com.example.gkudva.android_gtwitter.R;
 import com.example.gkudva.android_gtwitter.model.Tweet;
-import com.example.gkudva.android_gtwitter.model.TweetManager;
-import com.example.gkudva.android_gtwitter.model.User;
 import com.example.gkudva.android_gtwitter.presenter.TimelinePresenter;
+import com.example.gkudva.android_gtwitter.util.DividerItemDecoration;
 import com.example.gkudva.android_gtwitter.util.EndlessRecyclerViewScrollListener;
 import com.example.gkudva.android_gtwitter.util.InfoMessage;
 import com.example.gkudva.android_gtwitter.util.SpacesItemDecoration;
-import com.example.gkudva.android_gtwitter.util.TwitterClient;
 import com.example.gkudva.android_gtwitter.view.TimelineMvpView;
 import com.example.gkudva.android_gtwitter.view.adapter.TweetsAdapter;
 
@@ -27,18 +25,19 @@ import java.util.List;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 
+import static com.example.gkudva.android_gtwitter.R.id.swipeContainer;
+
 public class TimelineActivity extends AppCompatActivity implements TimelineMvpView,SwipeRefreshLayout.OnRefreshListener{
 
     private TimelinePresenter presenter;
     private TweetsAdapter mAdapter;
     private List<Tweet> mTweetList;
     private InfoMessage mInfoMessage;
-    private LinearLayoutManager layoutManager;
     private EndlessRecyclerViewScrollListener endlessRecyclerViewScrollListener;
 
     private static final String TAG = "Timeline Activity";
 
-    @BindView(R.id.swipeContainer)
+    @BindView(swipeContainer)
     SwipeRefreshLayout swipeRefreshLayout;
     @BindView(R.id.rvTweets)
     RecyclerView rvTweets;
@@ -66,6 +65,7 @@ public class TimelineActivity extends AppCompatActivity implements TimelineMvpVi
 
         setUserInfo(presenter.getCurrentUser());
         swipeRefreshLayout.setOnRefreshListener(this);
+        presenter.initTweetList();
 
     }
 
@@ -76,8 +76,8 @@ public class TimelineActivity extends AppCompatActivity implements TimelineMvpVi
 
     @Override
     public void onRefresh() {
-        presenter.loadArticles(mQuery, mFilterOptions);
-        swipeRefreshLayout.setRefreshing(false);
+        presenter.populateTimeline(-1);
+    //    swipeRefreshLayout.setRefreshing(false);
     }
 
     @Override
@@ -104,12 +104,29 @@ public class TimelineActivity extends AppCompatActivity implements TimelineMvpVi
     }
 
     @Override
-    public void showTimeline(List<Tweet> timelineList) {
+    public void showTimeline(int curSize, int listSize, List<Tweet> timelineList) {
         TweetsAdapter adapter = (TweetsAdapter) rvTweets.getAdapter();
         adapter.setTimelineList(timelineList);
+/*
+        if (curSize == 0)
+        {
+            adapter.notifyItemRangeRemoved(curSize, listSize);
+        }
+        else
+        {
+           adapter.notifyItemRangeInserted(curSize, listSize);
+        }
+*/
         adapter.notifyDataSetChanged();
-        rvTweets.requestFocus();
-        rvTweets.setVisibility(View.VISIBLE);
+    //    rvTweets.requestFocus();
+    //    rvTweets.setVisibility(View.VISIBLE);
+    }
+
+    @Override
+    public void handleSwipeRefresh() {
+        if (swipeRefreshLayout.isRefreshing()) {
+            swipeRefreshLayout.setRefreshing(false);
+        }
     }
 
     private void setupRecyclerView(RecyclerView recyclerView) {
@@ -125,18 +142,53 @@ public class TimelineActivity extends AppCompatActivity implements TimelineMvpVi
 
         });
     */
-        recyclerView.setAdapter(adapter);
-        layoutManager = new LinearLayoutManager(this);
-        recyclerView.setLayoutManager(layoutManager);
 
-        endlessRecyclerViewScrollListener = new EndlessRecyclerViewScrollListener(layoutManager) {
-            @Override
-            public void onLoadMore(int page, int totalItemsCount) {
-                presenter.loadArticles(mQuery, mFilterOptions);
-            }
-        };
+        final int ydy = 0;
+        final LinearLayoutManager layoutManager = new LinearLayoutManager(this);
+        layoutManager.setOrientation(LinearLayoutManager.VERTICAL);
+        recyclerView.setLayoutManager(layoutManager);
+        recyclerView.setAdapter(adapter);
 
         recyclerView.addOnScrollListener(endlessRecyclerViewScrollListener);
         recyclerView.addItemDecoration(new SpacesItemDecoration(20));
+
+        RecyclerView.ItemDecoration itemDecoration = new
+                DividerItemDecoration(this, DividerItemDecoration.VERTICAL_LIST);
+        recyclerView.addItemDecoration(itemDecoration);
+        recyclerView.addOnScrollListener(new EndlessRecyclerViewScrollListener(layoutManager) {
+            @Override
+            public void onLoadMore(int page, int totalItemsCount) {
+                customLoadMoreDataFromApi(page);
+            }
+
+            @Override
+            public void onScrolled(RecyclerView recyclerView, int dx, int dy) {
+                super.onScrolled(recyclerView, dx, dy);
+                int offset = dy ;//- ydy;
+                //ydy = dy;
+                boolean shouldRefresh = (layoutManager.findFirstCompletelyVisibleItemPosition() == 0)
+                        && (recyclerView.getScrollState() == RecyclerView.SCROLL_STATE_DRAGGING) && offset > 30;
+                if (shouldRefresh) {
+                    //swipeRefreshLayout.setRefreshing(true);
+                    //Refresh to load data here.
+                    return;
+                }
+                boolean shouldPullUpRefresh = layoutManager.findLastCompletelyVisibleItemPosition() == layoutManager.getChildCount() - 1
+                        && recyclerView.getScrollState() == RecyclerView.SCROLL_STATE_DRAGGING && offset < -30;
+                if (shouldPullUpRefresh) {
+                    //swipeRefreshLayout.setRefreshing(true);
+                    //refresh to load data here.
+                    return;
+                }
+                swipeRefreshLayout.setRefreshing(true);
+            }
+        });
+
+    }
+
+    private void customLoadMoreDataFromApi(int page) {
+        // Returns results with an ID less than (that is, older than) or equal to the specified ID.
+        long maxId = mTweetList.get(mTweetList.size() - 1).id - 1;
+        presenter.populateTimeline(maxId);
     }
 }

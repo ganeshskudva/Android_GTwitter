@@ -7,16 +7,16 @@ import com.example.gkudva.android_gtwitter.model.Tweet;
 import com.example.gkudva.android_gtwitter.model.TweetManager;
 import com.example.gkudva.android_gtwitter.model.User;
 import com.example.gkudva.android_gtwitter.util.JSONDeserializer;
+import com.example.gkudva.android_gtwitter.util.NetworkUtil;
 import com.example.gkudva.android_gtwitter.util.TwitterClient;
 import com.example.gkudva.android_gtwitter.view.TimelineMvpView;
-import com.example.gkudva.android_gtwitter.view.activities.TimelineActivity;
 import com.loopj.android.http.JsonHttpResponseHandler;
 
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
-import org.xml.sax.ErrorHandler;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import cz.msebera.android.httpclient.Header;
@@ -38,7 +38,7 @@ public class TimelinePresenter implements Presenter<TimelineMvpView> {
     @Override
     public void attachView(TimelineMvpView view) {
         this.mainMvpView = view;
-
+        mTweetList = new ArrayList<Tweet>();
     }
 
     @Override
@@ -98,7 +98,7 @@ public class TimelinePresenter implements Presenter<TimelineMvpView> {
 
     // Send an API request to get the timeline JSON
     // Fill the listview by creating the tweet objects from JSON
-    private void populateTimeline(final long maxId) {
+    public void populateTimeline(final long maxId) {
         mClient.getHomeTimeline(maxId, new JsonHttpResponseHandler() {
             @Override
             public void onSuccess(int statusCode, Header[] headers, JSONArray response) {
@@ -110,35 +110,50 @@ public class TimelinePresenter implements Presenter<TimelineMvpView> {
                         Log.d(TAG, "tweet size: " + tweetResponseList.size());
                         if (maxId == -1) {
                             int listSize = mTweetList.size();
-                            mTweetList.clear();
-                            mAdapter.notifyItemRangeRemoved(0, listSize);
+                        //    mTweetList.clear();
+                        //    mainMvpView.showTimeline(0, listSize, mTweetList);
+                        //    mAdapter.notifyItemRangeRemoved(0, listSize);
 
                             mTweetManager.clearTweetList();
                         }
 
                         int curSize = mTweetList.size();
                         mTweetList.addAll(tweetResponseList);
-                        mAdapter.notifyItemRangeInserted(curSize, tweetResponseList.size());
+                        mainMvpView.showTimeline(curSize, tweetResponseList.size(), mTweetList);
+                        //mAdapter.notifyItemRangeInserted(curSize, tweetResponseList.size());
 
                         mTweetManager.storeTweetList(mTweetList);
                     }
                 } catch (JSONException e) {
-                    ErrorHandler.handleAppException(e, "Exception from populating Twitter timeline");
+                    Log.d(TAG, "Exception from populating Twitter timeline");
                 }
 
-                handleSwipeRefresh();
+                mainMvpView.handleSwipeRefresh();
             }
 
             @Override
             public void onFailure(int statusCode, Header[] headers, Throwable throwable, JSONObject errorResponse) {
-                handleSwipeRefresh();
+                mainMvpView.handleSwipeRefresh();
                 if (errorResponse != null) {
-                    ErrorHandler.logAppError(errorResponse.toString());
+                    Log.d(TAG, "Error: " + errorResponse.toString());
                 }
-
-                ErrorHandler.displayError(TimelineActivity.this, AppConstants.DEFAULT_ERROR_MESSAGE);
+                mainMvpView.showMessage("Oops, something went wrong. Please try again later.");
             }
         });
+    }
+
+    public void initTweetList()
+    {
+        if (!NetworkUtil.isOnline()) {
+            List<Tweet> offlineTweetList = mTweetManager.getStoredTweetList();
+            if (offlineTweetList != null) {
+                mTweetList.addAll(offlineTweetList);
+                mainMvpView.showTimeline(0, offlineTweetList.size(), mTweetList);
+    //            mAdapter.notifyItemRangeInserted(0, offlineTweetList.size());
+            }
+        } else {
+            populateTimeline(-1);
+        }
     }
 
 }

@@ -6,6 +6,12 @@
 
     <color name="primary">#1DA1F2</color>
     <color name="primary_dark">#388DCE</color>
+    <color name="secondary">#14171A</color>
+
+    <color name="dark_gray">#657786</color>
+    <color name="light_gray">#AAB8C2</color>
+    <color name="extra_light_gray">#E1E8ED</color>
+    <color name="extra_extra_light_gray">#F5F8FA</color>
 
     <color name="twitter_gray">#657786</color>
     <color name="twitter_blue">#1da1f2</color>
@@ -13,4 +19,21 @@
     <color name="twitter_red">#e0245e</color>
     <color name="white">#FFFFFF</color>
     <color name="translucent_highlighted">#4bFFFF00</color>
+
+
+    <color name="error">#E81C4F</color>
+    <color name="tweet_disabled">#801DA1F2</color>
+
+    <!-- icon colors -->
+    <color name="favorite_default">#AAB8C2</color>
+    <color name="favorite_pressed">#80AAB8C2</color>
+    <color name="favorite_on">#E81C4F</color>
+
+    <color name="retweet_default">#AAB8C2</color>
+    <color name="retweet_pressed">#80AAB8C2</color>
+    <color name="retweet_on">#19CF86</color>
+    <color name="retweet_inactive">#4DAAB8C2</color>
+
+    <color name="reply_default">#AAB8C2</color>
+    <color name="reply_pressed">#80AAB8C2</color>
 </resources>
